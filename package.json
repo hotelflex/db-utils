@@ -1,11 +1,12 @@
 {
   "name": "@hotelflex/db-utils",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "main": "src",
   "scripts": {
     "precommit": "pretty-quick --staged"
   },
   "dependencies": {
+    "pg": "^7.4.3",
     "knex": "^0.14.6"
   },
   "devDependencies": {
