@@ -3,8 +3,8 @@ const knex = require('knex')
 const createDbPool = (postgres, { min, max } = {}) =>
   knex({
     client: 'pg',
+    connection: postgres,
     pool: { min, max },
-    postgres,
   })
 
 const ensureDatabaseExists = async postgres => {
