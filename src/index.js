@@ -1,3 +1,6 @@
+const pg = require('pg')
+pg.types.setTypeParser(20, 'text', parseInt)
+
 const knex = require('knex')
 
 const createDbPool = (postgres, { min, max } = {}) =>
