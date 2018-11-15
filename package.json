@@ -1,13 +1,17 @@
 {
   "name": "@hotelflex/db-utils",
-  "version": "1.1.0",
+  "version": "2.0.0",
   "main": "src",
   "scripts": {
     "precommit": "pretty-quick --staged"
   },
   "dependencies": {
+    "@hotelflex/id": "git+https://github.com/hotelflex/id.git#1.1.0",
+    "lodash": "^4.17.5",
+    "moment": "^2.22.2",
     "pg": "^7.4.3",
-    "knex": "^0.14.6"
+    "knex": "^0.14.6",
+    "objection": "^1.1.10"
   },
   "devDependencies": {
     "husky": "^0.14.3",
