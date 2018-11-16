@@ -3,7 +3,7 @@ const moment = require('moment')
 const Id = require('@hotelflex/id')
 const Errors = require('./Errors')
 
-const opsT = {}
+let opsT = {}
 
 class MemoryModel {
   constructor() {
