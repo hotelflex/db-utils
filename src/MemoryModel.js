@@ -4,17 +4,17 @@ const Id = require('@hotelflex/id')
 const Errors = require('./Errors')
 
 class MemoryModel {
-  static configure() {
-    this.ops = {}
-    this.table = {}
-  }
-
-  get docs() {
-    return Object.keys(this.table).map(k => this.table[k])
+  constructor() {
+    this.opsT = {}
+    this.docsT = {}
   }
 
   get ops() {
-    return Object.keys(this.ops).map(k => this.ops[k])
+    return Object.keys(this.opsT).map(k => this.opsT[k])
+  }
+
+  get docs() {
+    return Object.keys(this.docsT).map(k => this.docsT[k])
   }
 
   insert(data, opts = {}) {
@@ -26,8 +26,8 @@ class MemoryModel {
     data.version = 0
     data.createdAt = now
 
-    if (this.opts[operationId]) throw new Errors.DuplicateOperation()
-    if (this.table[data.id]) throw new Errors.WriteFailure()
+    if (this.opsT[operationId]) throw new Errors.DuplicateOperation()
+    if (this.docsT[data.id]) throw new Errors.WriteFailure()
 
     const op = {
       id: operationId,
@@ -50,8 +50,8 @@ class MemoryModel {
       op.committed = true
     }
 
-    this.ops[op.id] = op
-    this.docs[doc.id] = data
+    this.opsT[op.id] = op
+    this.docsT[data.id] = data
 
     return data
   }
@@ -65,8 +65,8 @@ class MemoryModel {
     data.version = doc.version + 1
     data.updatedAt = now
 
-    if (this.opts[operationId]) throw new Errors.DuplicateOperation()
-    if (!this.table[data.id]) throw new Errors.WriteFailure()
+    if (this.opsT[operationId]) throw new Errors.DuplicateOperation()
+    if (!this.docsT[doc.id]) throw new Errors.WriteFailure()
 
     const op = {
       id: operationId,
@@ -89,16 +89,22 @@ class MemoryModel {
       op.committed = true
     }
 
-    this.ops[op.id] = op
+    this.opsT[op.id] = op
 
-    const newDoc = Object.assign({}, doc, data)
-    this.docs[doc.id] = newDoc
+    const cDoc = this.docsT[doc.id]
+    const newDoc = Object.assign({}, cDoc, data)
+    this.docsT[doc.id] = newDoc
 
     return newDoc
   }
 
   delete(id) {
-    delete this.docs[id]
+    delete this.docsT[id]
+  }
+
+  reset() {
+    this.opsT = {}
+    this.docsT = {}
   }
 }
 
