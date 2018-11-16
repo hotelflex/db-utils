@@ -10,7 +10,7 @@ class MemoryModel {
     this.docsT = {}
   }
 
-  get ops() {
+  static get ops() {
     return Object.keys(opsT).map(k => opsT[k])
   }
 
