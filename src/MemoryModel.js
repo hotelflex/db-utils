@@ -3,14 +3,15 @@ const moment = require('moment')
 const Id = require('@hotelflex/id')
 const Errors = require('./Errors')
 
+const opsT = {}
+
 class MemoryModel {
   constructor() {
-    this.opsT = {}
     this.docsT = {}
   }
 
   get ops() {
-    return Object.keys(this.opsT).map(k => this.opsT[k])
+    return Object.keys(opsT).map(k => opsT[k])
   }
 
   get docs() {
@@ -26,7 +27,7 @@ class MemoryModel {
     data.version = 0
     data.createdAt = now
 
-    if (this.opsT[operationId]) throw new Errors.DuplicateOperation()
+    if (opsT[operationId]) throw new Errors.DuplicateOperation()
     if (this.docsT[data.id]) throw new Errors.WriteFailure()
 
     const op = {
@@ -50,7 +51,7 @@ class MemoryModel {
       op.committed = true
     }
 
-    this.opsT[op.id] = op
+    opsT[op.id] = op
     this.docsT[data.id] = data
 
     return data
@@ -65,7 +66,7 @@ class MemoryModel {
     data.version = doc.version + 1
     data.updatedAt = now
 
-    if (this.opsT[operationId]) throw new Errors.DuplicateOperation()
+    if (opsT[operationId]) throw new Errors.DuplicateOperation()
     if (!this.docsT[doc.id]) throw new Errors.WriteFailure()
 
     const op = {
@@ -89,7 +90,7 @@ class MemoryModel {
       op.committed = true
     }
 
-    this.opsT[op.id] = op
+    opsT[op.id] = op
 
     const cDoc = this.docsT[doc.id]
     const newDoc = Object.assign({}, cDoc, data)
@@ -103,7 +104,7 @@ class MemoryModel {
   }
 
   reset() {
-    this.opsT = {}
+    opsT = {}
     this.docsT = {}
   }
 }
