@@ -92,10 +92,8 @@ class MemoryModel {
 
     opsT[op.id] = op
 
-    const cDoc = this.docsT[doc.id]
-    const newDoc = Object.assign({}, cDoc, data)
+    const newDoc = Object.assign({}, doc, data)
     this.docsT[doc.id] = newDoc
-
     return newDoc
   }
 
