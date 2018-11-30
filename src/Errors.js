@@ -1,20 +1,18 @@
-class DuplicateOperation extends Error {
-  constructor() {
-    super()
+function DuplicateOperation(message) {
+  Error.captureStackTrace(this, this.constructor)
 
-    this.name = this.constructor.name
-    Error.captureStackTrace(this, this.constructor)
-  }
+  this.name = this.constructor.name
+  this.message = message
 }
 
-class WriteFailure extends Error {
-  constructor() {
-    super()
+function WriteFailure(message) {
+  Error.captureStackTrace(this, this.constructor)
 
-    this.name = this.constructor.name
-    Error.captureStackTrace(this, this.constructor)
-  }
+  this.name = this.constructor.name
+  this.message = message
 }
+
+require('util').inherits(module.exports, Error)
 
 module.exports = {
   DuplicateOperation,
