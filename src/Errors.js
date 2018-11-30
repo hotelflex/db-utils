@@ -1,3 +1,5 @@
+const util = require('util')
+
 function DuplicateOperation(message) {
   Error.captureStackTrace(this, this.constructor)
 
@@ -12,7 +14,8 @@ function WriteFailure(message) {
   this.message = message
 }
 
-require('util').inherits(module.exports, Error)
+util.inherits(DuplicateOperation, Error)
+util.inherits(WriteFailure, Error)
 
 module.exports = {
   DuplicateOperation,
