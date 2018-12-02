@@ -15,7 +15,7 @@ function createDbPool(postgres, { min, max } = {}) {
 }
 
 function createDbConn(postgres) {
-  const client = pg.Client(postgres)
+  const client = new pg.Client(postgres)
   client.connect()
   return client
   return knex({
