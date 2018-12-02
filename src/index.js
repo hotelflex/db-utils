@@ -14,8 +14,16 @@ function createDbPool(postgres, { min, max } = {}) {
   })
 }
 
+function createDbConn(postgres) {
+  return knex({
+    client: 'pg',
+    connection: postgres,
+  })
+}
+
 module.exports = {
   createDbPool,
+  createDbConn,
   PGModel,
   MemoryModel,
   Errors,
