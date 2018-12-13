@@ -1,6 +1,6 @@
 const pg = require('pg')
 pg.types.setTypeParser(20, 'text', parseInt)
-pg.types.setTypeParser(700, 'text', parseFloat)
+pg.types.setTypeParser(1700, 'text', parseFloat)
 
 const knex = require('knex')
 const PGModel = require('./PGModel')
