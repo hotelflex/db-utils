@@ -54,7 +54,7 @@ class PGModel extends Model {
     }
 
     try {
-      await Op.query().insert(op)
+      await Op.query(this.knex()).insert(op)
     } catch (err) {
       if (err.message.indexOf('operations_pkey') !== -1) {
         throw new Errors.DuplicateOperation()
@@ -81,28 +81,28 @@ class PGModel extends Model {
     data.createdAt = now
     const trx = await transaction.start(this.knex())
 
-    try {
-      const op = {
-        id: operationId,
-        timestamp: now,
-      }
-      if (messages.length > 0) {
-        const mStr = JSON.stringify(
-          messages.map((m, i) => ({
-            id: Id.create(),
-            topic: m.topic,
-            body: m.body,
-            timestamp: now,
-            operationId: Id.create(operationId + i),
-            transactionId,
-          })),
-        )
-        op.messages = mStr
-        op.committed = false
-      } else {
-        op.committed = true
-      }
+    const op = {
+      id: operationId,
+      timestamp: now,
+    }
+    if (messages.length > 0) {
+      const mStr = JSON.stringify(
+        messages.map((m, i) => ({
+          id: Id.create(),
+          topic: m.topic,
+          body: m.body,
+          timestamp: now,
+          operationId: Id.create(operationId + i),
+          transactionId,
+        })),
+      )
+      op.messages = mStr
+      op.committed = false
+    } else {
+      op.committed = true
+    }
 
+    try {
       await Op.query(trx).insert(op)
 
       const doc = await this.query(trx)
@@ -137,28 +137,28 @@ class PGModel extends Model {
     data.updatedAt = now
     const trx = await transaction.start(this.knex())
 
-    try {
-      const op = {
-        id: operationId,
-        timestamp: now,
-      }
-      if (messages.length > 0) {
-        const mStr = JSON.stringify(
-          messages.map((m, i) => ({
-            id: Id.create(),
-            topic: m.topic,
-            body: m.body,
-            timestamp: now,
-            operationId: Id.create(operationId + i),
-            transactionId,
-          })),
-        )
-        op.messages = mStr
-        op.committed = false
-      } else {
-        op.committed = true
-      }
+    const op = {
+      id: operationId,
+      timestamp: now,
+    }
+    if (messages.length > 0) {
+      const mStr = JSON.stringify(
+        messages.map((m, i) => ({
+          id: Id.create(),
+          topic: m.topic,
+          body: m.body,
+          timestamp: now,
+          operationId: Id.create(operationId + i),
+          transactionId,
+        })),
+      )
+      op.messages = mStr
+      op.committed = false
+    } else {
+      op.committed = true
+    }
 
+    try {
       await Op.query(trx).insert(op)
 
       const affectedRows = await this.query(trx)
