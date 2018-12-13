@@ -14,6 +14,39 @@ class MemoryModel {
     return Object.keys(opsT).map(k => opsT[k])
   }
 
+  static insertOp(opts = {}) {
+    const transactionId = opts.transactionId || Id.create()
+    const operationId = opts.operationId || Id.create()
+    const messages = opts.messages || []
+    const now = moment.utc().format('YYYY-MM-DDTHH:mm:ss')
+
+    if (opsT[operationId]) throw new Errors.DuplicateOperation()
+
+    const op = {
+      id: operationId,
+      timestamp: now,
+    }
+    if (messages.length > 0) {
+      const mStr = JSON.stringify(
+        messages.map((m, i) => ({
+          id: Id.create(),
+          topic: m.topic,
+          body: m.body,
+          timestamp: now,
+          operationId: Id.create(operationId + i),
+          transactionId,
+        })),
+      )
+      op.messages = mStr
+      op.committed = false
+    } else {
+      op.committed = true
+    }
+
+    opsT[op.id] = op
+    return op
+  }
+
   get docs() {
     return Object.keys(this.docsT).map(k => this.docsT[k])
   }

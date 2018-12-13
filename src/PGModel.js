@@ -24,6 +24,48 @@ class PGModel extends Model {
     return _.omitBy(pJson, _.isNil)
   }
 
+  static async insertOp(opts) {
+    if (!this.configured)
+      throw new Error('Model has not been connected to database.')
+    const transactionId = opts.transactionId
+    const operationId = opts.operationId
+    const messages = opts.messages || []
+    const now = moment.utc().format('YYYY-MM-DDTHH:mm:ss')
+
+    const op = {
+      id: operationId,
+      timestamp: now,
+    }
+    if (messages.length > 0) {
+      const mStr = JSON.stringify(
+        messages.map((m, i) => ({
+          id: Id.create(),
+          topic: m.topic,
+          body: m.body,
+          timestamp: now,
+          operationId: Id.create(operationId + i),
+          transactionId,
+        })),
+      )
+      op.messages = mStr
+      op.committed = false
+    } else {
+      op.committed = true
+    }
+
+    try {
+      await Op.query().insert(op)
+    } catch (err) {
+      if (err.message.indexOf('operations_pkey') !== -1) {
+        throw new Errors.DuplicateOperation()
+      } else {
+        throw new Errors.WriteFailure(err.message)
+      }
+    }
+
+    return op
+  }
+
   static async insert(
     data,
     { transactionId, operationId, messages = [] } = {},
