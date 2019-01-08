@@ -181,7 +181,7 @@ class PGModel extends Model {
   static async delete(id) {
     const affectedRows = await this.query().deleteById(id)
     if (affectedRows !== 1)
-      throw Erros.WriteFailure(`Doc with id ${id} could not be deleted.`)
+      throw Errors.WriteFailure(`Doc with id ${id} could not be deleted.`)
   }
 }
 
