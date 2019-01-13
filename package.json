@@ -1,6 +1,6 @@
 {
   "name": "@hotelflex/db-utils",
-  "version": "2.1.5",
+  "version": "2.2.0",
   "main": "src",
   "scripts": {
     "precommit": "pretty-quick --staged"

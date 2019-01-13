@@ -24,13 +24,12 @@ class PGModel extends Model {
     return _.omitBy(pJson, _.isNil)
   }
 
-  static async insertOp(opts = {}) {
+  static async insertOp({ transactionId, operationId, messages = [] } = {}) {
     if (!this.configured)
       throw new Error('Model has not been connected to database.')
-    transactionId = opts.transactionId || Id.create()
-    operationId = opts.operationId || Id.create()
+    transactionId = transactionId || Id.create()
+    operationId = operationId || Id.create()
 
-    const messages = opts.messages || []
     const now = moment.utc().format('YYYY-MM-DDTHH:mm:ss')
 
     const op = {
