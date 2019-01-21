@@ -74,7 +74,7 @@ class PGModel extends Model {
 
   static async insert(
     data,
-    { transactionId, operationId, messages = [] } = {},
+    { transactionId, operationId, messages = [], fastDelete = false } = {},
   ) {
     if (!this.configured)
       throw new Error('Model has not been connected to database.')
@@ -90,7 +90,7 @@ class PGModel extends Model {
     const op = {
       id: operationId,
       timestamp: now,
-      fastDelete: false,
+      fastDelete,
     }
     if (messages.length > 0) {
       const mStr = JSON.stringify(
@@ -131,7 +131,7 @@ class PGModel extends Model {
   static async update(
     doc,
     data,
-    { transactionId, operationId, messages = [] } = {},
+    { transactionId, operationId, messages = [], fastDelete = false } = {},
   ) {
     if (!this.configured)
       throw new Error('Model has not been connected to database.')
@@ -147,7 +147,7 @@ class PGModel extends Model {
     const op = {
       id: operationId,
       timestamp: now,
-      fastDelete: false,
+      fastDelete,
     }
     if (messages.length > 0) {
       const mStr = JSON.stringify(
