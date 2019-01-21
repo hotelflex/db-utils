@@ -24,7 +24,12 @@ class PGModel extends Model {
     return _.omitBy(pJson, _.isNil)
   }
 
-  static async insertOp({ transactionId, operationId, messages = [] } = {}) {
+  static async insertOp({
+    transactionId,
+    operationId,
+    messages = [],
+    fastDelete = false,
+  } = {}) {
     if (!this.configured)
       throw new Error('Model has not been connected to database.')
     transactionId = transactionId || Id.create()
@@ -35,6 +40,7 @@ class PGModel extends Model {
     const op = {
       id: operationId,
       timestamp: now,
+      fastDelete,
     }
     if (messages.length > 0) {
       const mStr = JSON.stringify(
@@ -84,6 +90,7 @@ class PGModel extends Model {
     const op = {
       id: operationId,
       timestamp: now,
+      fastDelete: false,
     }
     if (messages.length > 0) {
       const mStr = JSON.stringify(
@@ -140,6 +147,7 @@ class PGModel extends Model {
     const op = {
       id: operationId,
       timestamp: now,
+      fastDelete: false,
     }
     if (messages.length > 0) {
       const mStr = JSON.stringify(
