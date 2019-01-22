@@ -13,12 +13,7 @@ class Op extends Model {
 class PGModel extends Model {
   static configure(db) {
     this.knex(db)
-    this._db = db
     this.configured = true
-  }
-
-  get db() {
-    return this._db
   }
 
   $parseDatabaseJson(json) {
@@ -33,7 +28,7 @@ class PGModel extends Model {
     transactionId,
     operationId,
     messages = [],
-    fastDelete = false,
+    idempotentSafe = true,
   } = {}) {
     if (!this.configured)
       throw new Error('Model has not been connected to database.')
@@ -45,7 +40,7 @@ class PGModel extends Model {
     const op = {
       id: operationId,
       timestamp: now,
-      fastDelete,
+      idempotentSafe,
     }
     if (messages.length > 0) {
       const mStr = JSON.stringify(
@@ -77,10 +72,9 @@ class PGModel extends Model {
     return op
   }
 
-  // fastD -> idempotent
   static async insert(
     data,
-    { transactionId, operationId, messages = [], fastDelete = false } = {},
+    { transactionId, operationId, messages = [], idempotentSafe = true } = {},
   ) {
     if (!this.configured)
       throw new Error('Model has not been connected to database.')
@@ -96,7 +90,7 @@ class PGModel extends Model {
     const op = {
       id: operationId,
       timestamp: now,
-      fastDelete,
+      idempotentSafe,
     }
     if (messages.length > 0) {
       const mStr = JSON.stringify(
@@ -137,7 +131,7 @@ class PGModel extends Model {
   static async update(
     doc,
     data,
-    { transactionId, operationId, messages = [], fastDelete = false } = {},
+    { transactionId, operationId, messages = [], idempotentSafe = true } = {},
   ) {
     if (!this.configured)
       throw new Error('Model has not been connected to database.')
@@ -153,7 +147,7 @@ class PGModel extends Model {
     const op = {
       id: operationId,
       timestamp: now,
-      fastDelete,
+      idempotentSafe,
     }
     if (messages.length > 0) {
       const mStr = JSON.stringify(

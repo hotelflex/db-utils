@@ -7,10 +7,10 @@ const PGModel = require('./PGModel')
 const MemoryModel = require('./MemoryModel')
 const Errors = require('./Errors')
 
-function createDbPool(postgres, { min, max } = {}) {
+function createDbPool(postgres, { min, max } = {}, connOpts = {}) {
   return knex({
     client: 'pg',
-    connection: postgres,
+    connection: Object.assign({}, postgres, connOpts),
     pool: { min, max },
   })
 }
