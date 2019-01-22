@@ -13,7 +13,12 @@ class Op extends Model {
 class PGModel extends Model {
   static configure(db) {
     this.knex(db)
+    this._db = db
     this.configured = true
+  }
+
+  get db() {
+    return this._db
   }
 
   $parseDatabaseJson(json) {
@@ -72,6 +77,7 @@ class PGModel extends Model {
     return op
   }
 
+  // fastD -> idempotent
   static async insert(
     data,
     { transactionId, operationId, messages = [], fastDelete = false } = {},
