@@ -186,10 +186,48 @@ class PGModel extends Model {
     }
   }
 
-  static async delete(id) {
-    const affectedRows = await this.query().deleteById(id)
-    if (affectedRows !== 1)
-      throw Errors.WriteFailure(`Doc with id ${id} could not be deleted.`)
+  static async delete(id, { transactionId, operationId, messages = [] }) {
+    if (!this.configured)
+      throw new Error('Model has not been connected to database.')
+    transactionId = transactionId || Id.create()
+    operationId = operationId || Id.create()
+
+    const trx = await transaction.start(this.knex())
+
+    const op = {
+      id: operationId,
+      timestamp: now,
+      retrySafe,
+    }
+    if (messages.length > 0) {
+      const mStr = JSON.stringify(
+        messages.map((m, i) => ({
+          id: Id.create(),
+          topic: m.topic,
+          body: m.body,
+          timestamp: now,
+          operationId: Id.create(operationId + i),
+          transactionId,
+        })),
+      )
+      op.messages = mStr
+      op.committed = false
+    } else {
+      op.committed = true
+    }
+
+    try {
+      await Op.query(trx).insert(op)
+      await this.query(trx).deleteById(id)
+      await trx.commit()
+    } catch (err) {
+      await trx.rollback()
+      if (err.message.indexOf('operations_pkey') !== -1) {
+        throw new Errors.DuplicateOperation()
+      } else {
+        throw new Errors.WriteFailure(err.message)
+      }
+    }
   }
 }
 
