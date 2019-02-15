@@ -186,7 +186,7 @@ class PGModel extends Model {
     }
   }
 
-  static async delete(id, { transactionId, operationId, messages = [] }) {
+  static async delete(id, { transactionId, operationId, messages = [], retrySafe = true }) {
     if (!this.configured)
       throw new Error('Model has not been connected to database.')
     transactionId = transactionId || Id.create()
