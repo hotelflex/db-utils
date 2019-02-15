@@ -192,6 +192,7 @@ class PGModel extends Model {
     transactionId = transactionId || Id.create()
     operationId = operationId || Id.create()
 
+    const now = moment.utc().format('YYYY-MM-DDTHH:mm:ss')
     const trx = await transaction.start(this.knex())
 
     const op = {
