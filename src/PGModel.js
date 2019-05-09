@@ -128,6 +128,64 @@ class PGModel extends Model {
     }
   }
 
+  static async batchInsert(
+    rows,
+    { transactionId, operationId, messages = [], retrySafe = true } = {},
+  ) {
+    if (!this.configured)
+      throw new Error('Model has not been connected to database.')
+    transactionId = transactionId || Id.create()
+    operationId = operationId || Id.create()
+
+    const now = moment.utc().format('YYYY-MM-DDTHH:mm:ss')
+    for (var i = rows.length - 1; i >= 0; i--) {
+      rows[i].version = 0
+      rows[i].createdAt = now
+    }
+
+    const trx = await transaction.start(this.knex())
+
+    const op = {
+      id: operationId,
+      timestamp: now,
+      retrySafe,
+    }
+    if (messages.length > 0) {
+      const mStr = JSON.stringify(
+        messages.map((m, i) => ({
+          id: Id.create(),
+          topic: m.topic,
+          body: m.body,
+          timestamp: now,
+          operationId: Id.create(operationId + i),
+          transactionId,
+        })),
+      )
+      op.messages = mStr
+      op.committed = false
+    } else {
+      op.committed = true
+    }
+
+    try {
+      await Op.query(trx).insert(op)
+
+      const newIds = await trx
+        .batchInsert(this.tableName, rows)
+        .returning('id')
+
+      await trx.commit()
+      return newIds
+    } catch (err) {
+      await trx.rollback()
+      if (err.message.indexOf('operations_pkey') !== -1) {
+        throw new Errors.DuplicateOperation()
+      } else {
+        throw new Errors.WriteFailure(err.message)
+      }
+    }
+  }
+
   static async update(
     doc,
     data,
