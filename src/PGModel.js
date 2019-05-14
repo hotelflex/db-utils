@@ -24,6 +24,10 @@ class PGModel extends Model {
     return _.omitBy(pJson, _.isNil)
   }
 
+  static getOpById(id) {
+    return Op.query().findById(id)
+  }
+
   static async insertOp({
     transactionId,
     operationId,
