@@ -13,7 +13,7 @@ module.exports.createTransaction = knex => {
   })
 }
 
-module.exports.createDbPool = (postgres, { min, max } = {}, connOpts = {}) => {
+module.exports.getKnexClient = (postgres, { min, max } = {}, connOpts = {}) => {
   return knex({
     client: 'pg',
     connection: Object.assign({}, postgres, connOpts),
@@ -21,7 +21,7 @@ module.exports.createDbPool = (postgres, { min, max } = {}, connOpts = {}) => {
   })
 }
 
-module.exports.createDbConn = postgres => {
+module.exports.getPGClient = postgres => {
   const client = new pg.Client(postgres)
   client.connect()
   return client
