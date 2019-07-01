@@ -25,8 +25,4 @@ module.exports.createDbConn = postgres => {
   const client = new pg.Client(postgres)
   client.connect()
   return client
-  return knex({
-    client: 'pg',
-    connection: postgres,
-  })
 }
