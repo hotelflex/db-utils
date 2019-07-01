@@ -1,13 +1,19 @@
 const pg = require('pg')
+const knex = require('knex')
+const Errors = require('./Errors')
+
 pg.types.setTypeParser(20, 'text', parseInt)
 pg.types.setTypeParser(1700, 'text', parseFloat)
 
-const knex = require('knex')
-const PGModel = require('./PGModel')
-const MemoryModel = require('./MemoryModel')
-const Errors = require('./Errors')
+module.exports.Errors = Errors
 
-function createDbPool(postgres, { min, max } = {}, connOpts = {}) {
+module.exports.createTransaction = knex => {
+  return new Promise(resolve => {
+    return knex.transaction(resolve)
+  })
+}
+
+module.exports.createDbPool = (postgres, { min, max } = {}, connOpts = {}) => {
   return knex({
     client: 'pg',
     connection: Object.assign({}, postgres, connOpts),
@@ -15,7 +21,7 @@ function createDbPool(postgres, { min, max } = {}, connOpts = {}) {
   })
 }
 
-function createDbConn(postgres) {
+module.exports.createDbConn = postgres => {
   const client = new pg.Client(postgres)
   client.connect()
   return client
@@ -23,12 +29,4 @@ function createDbConn(postgres) {
     client: 'pg',
     connection: postgres,
   })
-}
-
-module.exports = {
-  createDbPool,
-  createDbConn,
-  PGModel,
-  MemoryModel,
-  Errors,
 }
