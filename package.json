@@ -14,7 +14,7 @@
   "author": "Hotelflex Limited",
   "license": "UNLICENSED",
   "devDependencies": {
-    "mocha": "^6.2.0"
+    "mocha": "^10.2.0"
   },
   "dependencies": {
     "pg": "^7.12.1"
